@@ -83,12 +83,12 @@ Function New-PSWorkItem {
             $DueDate = (Get-Date).AddDays($DaysDue)
         }
         Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Validating category $Category"
-        $splat.query = "SELECT * FROM categories WHERE category = '$Category' collate nocase"
+        $splat.query = "SELECT * FROM categories WHERE category = '$(_sanitizeString($Category))' collate nocase"
         $cat = Invoke-MySQLiteQuery @splat
         if ($cat.category -eq $Category) {
             Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Adding task $name with category $Category due $dueDate"
-            $task = [psworkitem]::new($Name, $Category)
-            $task.description = $Description
+            $task = [psworkitem]::new($(_sanitizeString($Name)), $(_sanitizeString($Category)))
+            $task.description = $(_sanitizeString($Description))
             $task.duedate = $DueDate
             Write-Debug "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Detected culture $(Get-Culture)"
             Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] Inserting task:"

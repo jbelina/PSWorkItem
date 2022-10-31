@@ -44,7 +44,7 @@ Function Remove-PSWorkItemCategory {
         if ($conn.state -eq 'open') {
             foreach ($item in $Category ) {
                 Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] Removing category $item "
-                $query = "DELETE FROM categories WHERE category = '$item'"
+                $query = "DELETE FROM categories WHERE category = '$(_sanitizeString($item))'"
                 if ($pscmdlet.ShouldProcess($item)) {
                     Invoke-MySQLiteQuery -Query $query -Connection $conn -KeepAlive
                 }

@@ -67,7 +67,7 @@ Function Add-PSWorkItemCategory {
         if ($conn.state -eq "open") {
             foreach ($item in $category) {
                 #test if the category already exists
-                $splat.Query = "SELECT * FROM categories WHERE category = '$item'"
+                $splat.Query = "SELECT * FROM categories WHERE category = '$(_sanitizeString($item))'"
                 $test = Invoke-MySQLiteQuery @splat
                 if ($test.category -eq $item -AND (-Not $Force)) {
                     Write-Warning "$($myinvocation.mycommand): The category $Category already exists"
@@ -75,7 +75,7 @@ Function Add-PSWorkItemCategory {
                 }
                 elseif ($test.category -eq $item -AND $Force) {
                     Write-Verbose "$($myinvocation.mycommand): The category $Category already exists and will be overwritten"
-                    $splat.Query = "DELETE FROM categories WHERE category = '$item'"
+                    $splat.Query = "DELETE FROM categories WHERE category = '$(_sanitizeString($item))'"
                     if ($Pscmdlet.ShouldProcess($item, "Remove category")) {
                         Invoke-MySQLiteQuery @splat
                         $ok = $true
@@ -87,12 +87,12 @@ Function Add-PSWorkItemCategory {
 
                 Write-Debug "$($myinvocation.mycommand): Connection state is $($conn.state)"
                 if ($ok) {
-                    Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Adding category $Item"
-                    $splat.query = "INSERT INTO categories (category,description) VALUES ('$item','$Description')"
+                    Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Adding category $item"
+                    $splat.query = "INSERT INTO categories (category,description) VALUES ('$(_sanitizeString($item))','$(_sanitizeString($Description))')"
                     If ($pscmdlet.ShouldProcess($item)) {
                         Invoke-MySQLiteQuery @splat
                         if ($Passthru) {
-                            $splat.query = "Select * from categories where category = '$item'"
+                            $splat.query = "Select * from categories where category = '$(_sanitizeString($item))'"
                             Invoke-MySQLiteQuery @splat | ForEach-Object {
                                 [PSWorkItemCategory]::New($_.category, $_.Description)
                             }

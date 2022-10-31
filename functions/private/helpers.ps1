@@ -20,6 +20,20 @@ function _newWorkItem {
     $item
 }
 
+function _sanitizeString {
+    [cmdletbinding()]
+    Param([object]$string)
+    # Purpose sanitize string input prior to SQLite query to prevent SQL injection (replace single quote with two single quotes)
+
+    if ($string -like "*'*") {
+        Write-Debug "[$((Get-Date).TimeofDay) _sanitizeString] Sanitize string: $string"
+        $string -replace "'", "''" 
+    }
+    else {
+        $string
+    }
+}
+
 <#
 class PSWorkItem {
     #this can be the ROWID of the item in the database

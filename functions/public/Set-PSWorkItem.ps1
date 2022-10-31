@@ -80,7 +80,7 @@ Function Set-PSWorkItem {
         $basequery = "UPDATE tasks set taskmodified = '{0}'" -f (Get-Date)
         if ($PSBoundParameters.ContainsKey("Category")) {
             Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Validating category $category"
-            $splat.query = "SELECT * FROM categories WHERE category = '$Category' collate nocase"
+            $splat.query = "SELECT * FROM categories WHERE category = '$(_sanitizeString($Category))' collate nocase"
             Try {
                 $cat = Invoke-MySQLiteQuery @splat
             }
@@ -90,14 +90,14 @@ Function Set-PSWorkItem {
                 Throw $_
             }
         }
-        if (($cat.category -eq $Category) -OR (-Not $PSBoundParameters.ContainsKey("Category"))) {
+        if (($cat.category -eq $(_sanitizeString($Category))) -OR (-Not $PSBoundParameters.ContainsKey("Category"))) {
             Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Setting task"
             $updates = @{
-                name        = $name
-                description = $Description
+                name        = _sanitizeString($Name)
+                description = _sanitizeString($Description)
                 duedate     = $DueDate
                 progress    = $Progress
-                category    = $Category
+                category    = _sanitizeString($Category)
             }
             $updates.GetEnumerator() | Where-Object { $_.value } | ForEach-Object {
                 $basequery += ", $($_.key) = '$($_.value)'"
