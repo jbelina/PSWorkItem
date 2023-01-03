@@ -103,14 +103,14 @@ Function Get-PSWorkItem {
                 This format doesn't appear to respect culture
                 $tasks = ($tasks).Where({ [datetime]$_.duedate -le $d })
                 #>
-                $tasks = $tasks | Where-Object { ($_.duedate -as [datetime]) -le $d}
+                $tasks = $tasks | Where-Object { ($_.duedate -as [datetime]) -le $d }
                 Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): Re-Filtering found $($tasks.count) items"
             }
-            $i=0
+            $i = 0
             foreach ($task in $tasks) {
-              Write-Debug "Converting rowid $($task.rowid)"
-              $nwi = _newWorkItem $task -path $path
-              write-Debug "Adding $($nwi.name) to the result list"
+                Write-Debug "Converting rowid $($task.rowid)"
+                $nwi = _newWorkItem -data $task -path $path
+                write-Debug "Adding $($nwi.name) to the result list"
                 $results.Add($nwi)
                 $i++
             }

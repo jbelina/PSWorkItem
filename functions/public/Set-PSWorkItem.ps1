@@ -125,7 +125,7 @@ Function Set-PSWorkItem {
                     Write-Verbose "[$((Get-Date).TimeofDay) PROCESS] $($myinvocation.mycommand): $($splat.query)"
                     $data = Invoke-MySQLiteQuery @splat
                     $data | Out-String | Write-Verbose
-                    _newWorkItem $data -path $Path
+                    _newWorkItem -data  $data -path $Path
                 }
             }
         }
